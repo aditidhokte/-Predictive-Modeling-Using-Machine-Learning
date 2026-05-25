@@ -1,0 +1,58 @@
+# Predictive Modeling Using Machine Learning
+# Assignment Template
+
+import pandas as  pd
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, confusion_matrix, roc_curve, auc
+
+# 1. Load dataset
+data = pd.read_csv("data.csv")   # <-- Replace with your dataset file
+X = data.drop("target", axis=1)  # Features
+y = data["target"]               # Target variable
+
+# 2. Split dataset
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# 3. Train models
+# Linear Regression (for continuous targets)
+lin_reg = LinearRegression()
+lin_reg.fit(X_train, y_train)
+
+# Decision Tree
+dt = DecisionTreeClassifier()
+dt.fit(X_train, y_train)
+
+# Random Forest
+rf = RandomForestClassifier()
+rf.fit(X_train, y_train)
+
+# 4. Evaluate models
+print("\n--- Model Evaluation ---")
+
+# Decision Tree
+y_pred_dt = dt.predict(X_test)
+print("Decision Tree Accuracy:", accuracy_score(y_test, y_pred_dt))
+print("Confusion Matrix (DT):\n", confusion_matrix(y_test, y_pred_dt))
+
+# Random Forest
+y_pred_rf = rf.predict(X_test)
+print("Random Forest Accuracy:", accuracy_score(y_test, y_pred_rf))
+print("Confusion Matrix (RF):\n", confusion_matrix(y_test, y_pred_rf))
+
+# ROC Curve for Random Forest
+fpr, tpr, _ = roc_curve(y_test, rf.predict_proba(X_test)[:,1])
+roc_auc = auc(fpr, tpr)
+plt.plot(fpr, tpr, label=f"ROC curve (area = {roc_auc:.2f})")
+plt.xlabel("False Positive Rate")
+plt.ylabel("True Positive Rate")
+plt.title("ROC Curve - Random Forest")
+plt.legend()
+plt.show()
+
+print("\nLinear Regression R^2 Score:", lin_reg.score(X_test, y_test))
